@@ -7,14 +7,20 @@ import com.pjieyi.usercenter.exception.BusinessException;
 import com.pjieyi.usercenter.model.User;
 import com.pjieyi.usercenter.model.request.UserLoginRequest;
 import com.pjieyi.usercenter.model.request.UserRegisterRequest;
+import com.pjieyi.usercenter.model.response.CaptureResponse;
 import com.pjieyi.usercenter.service.UserService;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.pjieyi.usercenter.constant.UserConstant.USER_LOGIN_STATUS;
+import static com.pjieyi.usercenter.utils.AliyunIdentifyCode.getParams;
 
 /**
  * @author pjieyi
@@ -120,6 +126,18 @@ public class UserController {
         //删除登录成功时存储的session对象
         request.getSession().removeAttribute(USER_LOGIN_STATUS);
         return ResultUtils.success(1);
+    }
+
+
+    /**
+     * 图片二次验证
+     * @param getParams 验证参数
+     * @return
+     */
+    @GetMapping("/verifyCapture")
+    public BaseResponse verifyCapture(@RequestParam Map<String,String> getParams){
+        CaptureResponse captureResponse = userService.identifyCapture(getParams);
+        return ResultUtils.success(captureResponse);
     }
 
 }

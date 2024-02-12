@@ -14,7 +14,8 @@ public enum ErrorCode {
     NO_AUTH(40101,"无权限",""),
     //500系统错误
     SERVER_ERROR(50000,"服务异常",""),
-    SYSTEM_ERROR(50001,"系统内部异常","");
+    SYSTEM_ERROR(50001,"系统内部异常",""),
+    CAPTCHA_ERROR(-50005,"验证异常","");
 
 
     private final int code;

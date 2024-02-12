@@ -6,21 +6,26 @@ import com.pjieyi.usercenter.common.ErrorCode;
 import com.pjieyi.usercenter.exception.BusinessException;
 import com.pjieyi.usercenter.mapper.UserMapper;
 import com.pjieyi.usercenter.model.User;
+import com.pjieyi.usercenter.model.response.CaptureResponse;
 import com.pjieyi.usercenter.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.pjieyi.usercenter.constant.UserConstant.ADMIN_ROLE;
 import static com.pjieyi.usercenter.constant.UserConstant.USER_LOGIN_STATUS;
+import static com.pjieyi.usercenter.utils.AliyunIdentifyCode.getParams;
 
 /**
 * @author pjieyi
@@ -64,7 +69,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Matcher matcher = pattern.matcher(userAccount);
          if (! matcher.matches()){
              //有特殊字符存在
-             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户账户有特殊字符");
+             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户名只允许字母、数字和下划线");
          }
         //密码和确认密码不相同
         if (!userPassword.equals(checkPassword)){
@@ -230,6 +235,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.NO_AUTH,"必须是管理员");
         }
         return this.removeById(id);
+    }
+
+    /**
+     * 图片二次验证
+     * @param getParams 验证参数
+     * @return 图形验证响应参数
+     */
+    @Override
+    public CaptureResponse identifyCapture(Map<String, String> getParams) {
+        JSONObject jsonObject = getParams(getParams);
+        CaptureResponse captureResponse=new CaptureResponse();
+        try {
+            captureResponse.setResult(jsonObject.getString("result"));
+            captureResponse.setStatus(jsonObject.getString("status"));
+            captureResponse.setReason(jsonObject.getString("reason"));
+            JSONObject captchaArgs = jsonObject.getJSONObject("captcha_args");
+            String usedType = captchaArgs.getString("used_type");
+            String userIp = captchaArgs.getString("user_ip");
+            String scene = captchaArgs.getString("scene");
+            String referer = captchaArgs.getString("referer");
+            Map<String, String> captchaArgList = new HashMap<>();
+            captchaArgList.put("usedType", usedType);
+            captchaArgList.put("userIp", userIp);
+            captchaArgList.put("scene", scene);
+            captchaArgList.put("referer", referer);
+            captureResponse.setCaptchaArgs(captchaArgList);
+        }catch (RuntimeException e){
+            throw new BusinessException(ErrorCode.CAPTCHA_ERROR);
+        }
+        return captureResponse;
     }
 
     /**

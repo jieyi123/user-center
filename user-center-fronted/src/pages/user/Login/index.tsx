@@ -21,6 +21,7 @@ import { FormattedMessage, history, Link, SelectLang, useIntl, useModel } from '
 import styles from './index.less';
 import {SYSTEM_LOGO} from "@/constants";
 
+
 const LoginMessage: React.FC<{
   content: string;
 }> = ({ content }) => (
@@ -51,9 +52,11 @@ const Login: React.FC = () => {
     }
   };
 
+
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
+
       const user = await login({ ...values, type });
       if (user) {
         const defaultLoginSuccessMessage = intl.formatMessage({

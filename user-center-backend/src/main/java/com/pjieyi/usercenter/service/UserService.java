@@ -2,9 +2,11 @@ package com.pjieyi.usercenter.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pjieyi.usercenter.model.User;
+import com.pjieyi.usercenter.model.response.CaptureResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author pjieyi
@@ -60,4 +62,11 @@ public interface UserService extends IService<User> {
      * @return 结果
      */
     boolean deleteUser(long id, HttpServletRequest request);
+
+    /**
+     * 图片二次验证
+     * @param getParams 验证参数
+     * @return 图形验证响应参数
+     */
+    CaptureResponse identifyCapture(Map<String,String> getParams);
 }
